@@ -37,7 +37,7 @@ int main(){
 	
 
 	//temp constants for Hooke's law
-	double hX = 4.48;
+	vector<double> hX;
 	double hK = 5000 * ang;
 	double hF;
 
@@ -58,6 +58,15 @@ int main(){
 
 	}
 	prot_file.close();	
+
+	//set the desired distances and save them in a vector
+
+	for (int i=0; i<numAtoms-1; i++) {
+		hX.push_back(sqrt((atoms[i].getxCoor()-atoms[i+1].getxCoor())*(atoms[i].getxCoor()-atoms[i+1].getxCoor())
+				+(atoms[i].getyCoor()-atoms[i+1].getyCoor())*(atoms[i].getyCoor()-atoms[i+1].getyCoor())
+				+ (atoms[i].getzCoor()-atoms[i+1].getzCoor())*(atoms[i].getzCoor()-atoms[i+1].getzCoor())));
+		cout << hX[i] << endl;
+	}
 
 	ofstream fout;
 	  
@@ -94,9 +103,10 @@ int main(){
 					
 					//Hooke's portion
 					min = sqrt(min);
+					hK = 5.552 * pow(10,28) * ((atoms[k].getMass()*atoms[l].getMass()) / (atoms[k].getMass()+atoms[k].getMass())) * ang;
 					if (k == 0){
 						if(l ==1){
-							hF = (-1)*(hX- abs(min))*hK;
+							hF = (-1)*(hX[k]- abs(min))*hK;
 							Fx = hF * (dx/min);
 							Fy = hF * (dy/min);
 							Fz = hF * (dz/min);
@@ -108,7 +118,7 @@ int main(){
 					}
 					if (k == numAtoms -1){
 						if(l == k-1){
-							hF = (-1)*(hX- abs(min))*hK;
+							hF = (-1)*(hX[k-1]- abs(min))*hK;
 							Fx = hF * (dx/min);
 							Fy = hF * (dy/min);
 							Fz = hF * (dz/min);
@@ -119,8 +129,18 @@ int main(){
 						}
 					}
 					if (k != 0 && k != numAtoms -1){
-						if(l == k-1 || l == k+1){
-							hF = (-1)*(hX- abs(min))*hK;
+						if(l == k-1){
+							hF = (-1)*(hX[k-1]- abs(min))*hK;
+							Fx = hF * (dx/min);
+							Fy = hF * (dy/min);
+							Fz = hF * (dz/min);
+							x= atoms[k].getxVel() + (Fx/atoms[k].getMass())*timeStep;
+							y= atoms[k].getyVel() + (Fy/atoms[k].getMass())*timeStep;
+							z= atoms[k].getzVel() + (Fz/atoms[k].getMass())*timeStep;
+							atoms[k].set_Vel(x,y,z);
+						}
+						if(l == k+1){
+							hF = (-1)*(hX[k]- abs(min))*hK;
 							Fx = hF * (dx/min);
 							Fy = hF * (dy/min);
 							Fz = hF * (dz/min);

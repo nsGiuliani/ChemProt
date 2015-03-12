@@ -37,18 +37,19 @@ int main(){
 	string name;
 	char mass[10];
 	
-
-	//temp constants for Hooke's law
 	vector<double> hX;
 	double hK = 5000 * ang;
 	double hF;
 
+
+	// reads in the file and puts the atoms in a vector
 	ifstream prot_file;
 	prot_file.open("dumb.txt", ios::in);
+	//first line is the number of acids
 	prot_file >> numAtoms;
-
+	//second line is a comment
 	prot_file >> comment;
-
+	//loops through getting the name, mass, and init positions for all the atoms
 	for(int i = 0; i < numAtoms; i++) {
 		prot_file >> name;
 		prot_file >> mass;
@@ -61,7 +62,7 @@ int main(){
 	}
 	prot_file.close();	
 
-	//set the desired distances and save them in a vector
+	//set the init. distances and save them in a vector (this is for the Hooke's portion)
 
 	for (int i=0; i<numAtoms-1; i++) {
 		hX.push_back(sqrt((atoms[i].getxCoor()-atoms[i+1].getxCoor())*(atoms[i].getxCoor()-atoms[i+1].getxCoor())
@@ -74,24 +75,26 @@ int main(){
 	fout.open("trp.xyz");
 
 	for (int i=0; i<iterations; i++ ) {
+		//print current positions into the .xyz file
 		fout << numAtoms << endl;
 		fout << "iteration " << i << endl;
 		for (int k=0; k<numAtoms; k++) {
 			fout<<atoms[k].getName()<< "  " << atoms[k].getxCoor() <<"	"<<atoms[k].getyCoor() << "	"<< atoms[k].getzCoor()<< endl;
 		}
+		// update the positions using the velocity
 		for (int k=0; k<numAtoms; k++) { //k is the atom which is being updated
-			//update the coordinates and make sure they are in the box
+			
 			x= atoms[k].getxCoor() + atoms[k].getxVel()*timeStep/ang;
 			y= atoms[k].getyCoor() + atoms[k].getyVel()*timeStep/ang;
-			z= atoms[k].getzCoor() + atoms[k].getzVel()*timeStep/ang;
-			
+			z= atoms[k].getzCoor() + atoms[k].getzVel()*timeStep/ang;			
 
 			atoms[k].set_Coor(x,y,z);
 		}
 		for (int k=0; k<numAtoms; k++) { //k is the atom which is being updated
 			for (int l = 0; l<numAtoms;l++){ //l is the atom whose presence is applying force to k
 				double min = 1000000000;
-				if(l != k){ //make sure they are not the same atom
+				if(l != k){ //make sure they are not the same acid
+					//get the distance between the two acids
 					dist = (atoms[l].getxCoor()-atoms[k].getxCoor())*(atoms[l].getxCoor()-atoms[k].getxCoor())
 						+(atoms[l].getyCoor()-atoms[k].getyCoor())*(atoms[l].getyCoor()-atoms[k].getyCoor())
 						+ (atoms[l].getzCoor()-atoms[k].getzCoor())*(atoms[l].getzCoor()-atoms[k].getzCoor());
@@ -150,12 +153,12 @@ int main(){
 							z= atoms[k].getzVel() + (Fz/atoms[k].getMass())*timeStep;
 							atoms[k].set_Vel(x,y,z);
 						}
-					}
+					}//end of Hooke's potion
 
 					dx= dx*ang;
 					dy=dy*ang;
 					dz=dz*ang;
-					// update the velocity 
+					// update the velocity using VV thrm
 					double D = dx*dx+dy*dy+dz*dz;
 					double D_7= (dx*dx+dy*dy+dz*dz)*(dx*dx+dy*dy+dz*dz)*(dx*dx+dy*dy+dz*dz)*(dx*dx+dy*dy+dz*dz)*(dx*dx+dy*dy+dz*dz)*(dx*dx+dy*dy+dz*dz)
 						*(dx*dx+dy*dy+dz*dz);
@@ -172,9 +175,9 @@ int main(){
 
 				}		
 																	
-			}
-		}
-	}
+			}//loop through all acids
+		}//loop through all acids
+	}//loop for the num of iterations
 
 	fout.close();
 

@@ -6,6 +6,7 @@
 #include<fstream> //needed for files
 #include<vector>  
 #include "acid.cpp"
+#include <string>
 
 using namespace std;
 
@@ -32,8 +33,9 @@ int main(){
 	int numAtoms;
 	string comment;
 
-	double mass,c1,c2,c3;
+	double c1,c2,c3;
 	string name;
+	char mass[10];
 	
 
 	//temp constants for Hooke's law
@@ -42,7 +44,7 @@ int main(){
 	double hF;
 
 	ifstream prot_file;
-	prot_file.open("trp.txt", ios::in);
+	prot_file.open("dumb.txt", ios::in);
 	prot_file >> numAtoms;
 
 	prot_file >> comment;
@@ -53,7 +55,7 @@ int main(){
 		prot_file >> c1;
 		prot_file >> c2;
 		prot_file >> c3;
-		atoms.push_back(Acid(name, mass, c1,c2,c3, 0, 0, 0));
+		atoms.push_back(Acid(name, atof(mass), c1,c2,c3, 0, 0, 0));
 		cout <<name<<mass<< c1<<c2<<c3<< endl;
 
 	}
@@ -65,7 +67,6 @@ int main(){
 		hX.push_back(sqrt((atoms[i].getxCoor()-atoms[i+1].getxCoor())*(atoms[i].getxCoor()-atoms[i+1].getxCoor())
 				+(atoms[i].getyCoor()-atoms[i+1].getyCoor())*(atoms[i].getyCoor()-atoms[i+1].getyCoor())
 				+ (atoms[i].getzCoor()-atoms[i+1].getzCoor())*(atoms[i].getzCoor()-atoms[i+1].getzCoor())));
-		cout << hX[i] << endl;
 	}
 
 	ofstream fout;

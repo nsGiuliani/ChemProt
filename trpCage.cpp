@@ -36,7 +36,7 @@ int main(){
 	double c1,c2,c3;
 	string name;
 	char mass[10];
-	
+	vector<double> fix;
 	vector<double> hX;
 	double hK = 5000 * ang;
 	double hF;
@@ -70,6 +70,18 @@ int main(){
 				+ (atoms[i].getzCoor()-atoms[i+1].getzCoor())*(atoms[i].getzCoor()-atoms[i+1].getzCoor())));
 	}
 
+	// set fix
+	for (int k=0; k<numAtoms; k++) { 
+		for (int l = 0; l<numAtoms;l++){ 
+			if(l != k){ //make sure they are not the same acid
+				//get the distance between the two acids
+				dist = (atoms[l].getxCoor()-atoms[k].getxCoor())*(atoms[l].getxCoor()-atoms[k].getxCoor())
+					+(atoms[l].getyCoor()-atoms[k].getyCoor())*(atoms[l].getyCoor()-atoms[k].getyCoor())
+					+ (atoms[l].getzCoor()-atoms[k].getzCoor())*(atoms[l].getzCoor()-atoms[k].getzCoor());
+				fix.push_back(sqrt(dist));
+			}
+		}
+	}
 	ofstream fout;
 	  
 	fout.open("trp.xyz");

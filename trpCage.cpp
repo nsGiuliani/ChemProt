@@ -23,6 +23,9 @@ int main(){
 	double z;
 	double E = 1.712*(.000000000000000000001);
 	double sig = 3.4*(.0000000001);
+	double F1;
+	double F2;
+	double F;
 	double Fx;
 	double Fy;
 	double Fz;
@@ -40,6 +43,9 @@ int main(){
 	vector<double> hX;
 	double hK = 5000 * ang;
 	double hF;
+
+	double mljE = 4.1666666 * pow(10,-21);
+	double mljO;
 
 
 	// reads in the file and puts the atoms in a vector
@@ -64,7 +70,7 @@ int main(){
 
 	//set the init. distances and save them in a vector (this is for the Hooke's portion)
 
-	for (int i=0; i<numAtoms-1; i++) {
+	for (int i=0; i<numAtoms; i++) {
 		hX.push_back(sqrt((atoms[i].getxCoor()-atoms[i+1].getxCoor())*(atoms[i].getxCoor()-atoms[i+1].getxCoor())
 				+(atoms[i].getyCoor()-atoms[i+1].getyCoor())*(atoms[i].getyCoor()-atoms[i+1].getyCoor())
 				+ (atoms[i].getzCoor()-atoms[i+1].getzCoor())*(atoms[i].getzCoor()-atoms[i+1].getzCoor())));
@@ -185,6 +191,18 @@ int main(){
 					atoms[k].set_Vel(x,y,z);
 					//cout << Fx << endl;
 
+					//MLJ portion
+					mljO = fix[numAtoms* k + l];
+					F1 = mljE*(((60*pow(mljO,10))/pow(min, 11)) - (60*pow(mljO,12))/pow(min, 13));
+					F2 = (-1)*((12*mljE*pow(mljO,12))/(pow(min,13)));
+					F = F1+F2;
+					Fx = (dx * F)/(min * ang);
+					Fy = (dy * F)/(min * ang);
+					Fz = (dz * F)/(min * ang);
+					x= atoms[k].getxVel() + (Fx/atoms[k].getMass())*timeStep;
+					y= atoms[k].getyVel() + (Fy/atoms[k].getMass())*timeStep;
+					z= atoms[k].getzVel() + (Fz/atoms[k].getMass())*timeStep;
+					atoms[k].set_Vel(x,y,z);
 				}		
 																	
 			}//loop through all acids
